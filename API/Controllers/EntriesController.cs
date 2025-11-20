@@ -58,4 +58,26 @@ public class EntriesController(ISoftAuthService softAuthService, IEntryService e
         if (entry == null) return BadRequest();
         return Created();
     }
+
+    [HttpPut("{entryId}")]
+    public async Task<ActionResult> UpdateEntry(Guid entryId, [FromBody] UpdateEntryRequest request)
+    {
+        var group = await softAuthService.GetAuthenticatedGroup();
+        if (group == null) return Unauthorized();
+
+        var entry = await entryService.UpdateEntryById(entryId, request.IncidentTime, request.FulfilledTime);
+        if (entry == null) return NotFound();
+        return Ok(entry.ToDto());
+    }
+
+    [HttpDelete("{entryId}")]
+    public async Task<ActionResult> DeleteEntry(Guid entryId)
+    {
+        var group = await softAuthService.GetAuthenticatedGroup();
+        if (group == null) return Unauthorized();
+
+        var deleted = await entryService.DeleteEntryById(entryId);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
 }

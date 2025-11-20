@@ -6,9 +6,11 @@ namespace Common.Services;
 
 public interface IEntryService
 {
+    public Task<Entry?> UpdateEntryById(Guid entryId, DateTime? incidentTime, DateTime? fulfilledTime);
     public Task<Entry?> GetEntryById(Guid entryId);
     public Task<List<Entry>> GetGroupEntries(Guid groupId, int limit = 0, int offset = 0);
     public Task<Entry?> CreateEntry(Guid personId, Guid groupId, DateTime incidentTime, DateTime? fulfilledTime);
+    public Task<bool> DeleteEntryById(Guid entryId);
 }
 
 public class EntryService(AppDbContext dbContext) : IEntryService
@@ -47,5 +49,28 @@ public class EntryService(AppDbContext dbContext) : IEntryService
         await dbContext.Entries.AddAsync(entry);
         await dbContext.SaveChangesAsync();
         return entry;
+    }
+
+    public async Task<Entry?> UpdateEntryById(Guid entryId, DateTime? incidentTime, DateTime? fulfilledTime)
+    {
+        var entry = await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
+        if (entry == null) return null;
+
+        // Verify that the person exists
+        if (incidentTime != null) entry.IncidentTime = incidentTime.Value;
+        if (fulfilledTime is not null) entry.FulfilledTime = fulfilledTime.Value;
+
+        await dbContext.SaveChangesAsync();
+        return entry;
+    }
+
+    public async Task<bool> DeleteEntryById(Guid entryId)
+    {
+        var entry = await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
+        if (entry == null) return false;
+
+        dbContext.Entries.Remove(entry);
+        await dbContext.SaveChangesAsync();
+        return true;
     }
 }
