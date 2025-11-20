@@ -25,7 +25,7 @@ public class GroupsController(IGroupService groupService, ISoftAuthService softA
     {
         var group = await softAuthService.GetAuthenticatedGroup();
         if (group == null) return Unauthorized();
-        return Ok(group.ToDtoWithPeople());
+        return Ok(group.ToDto());
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class GroupsController(IGroupService groupService, ISoftAuthService softA
     {
         var group = await groupService.CreateGroup(groupItem.Slug, groupItem.Name, groupItem.Description);
         if (group == null) throw new Exception("Group was not created");
-        return Created((string?)null, group.ToDtoWithPeople());
+        return Created((string?)null, group.ToDto());
     }
 }
 

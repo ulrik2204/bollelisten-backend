@@ -12,12 +12,23 @@ namespace API.Controllers;
 public class PeopleController(ISoftAuthService softAuthService, IPersonService personService): ControllerBase
 {
 
+    [HttpGet]
+    public async Task<ActionResult> GetPeople()
+    {
+        var group = await softAuthService.GetAuthenticatedGroup();
+        if (group == null) return Unauthorized();
+
+        var people = await personService.GetPeople(group.Id);
+        return Ok(people.Select(person => person.ToDto()).ToList());
+
+    }
+
     [HttpGet("{personId}")]
     public async Task<ActionResult> GetPerson(Guid personId)
     {
         var person = await personService.GetPerson(personId);
         if (person == null) return NotFound();
-        return Ok(person);
+        return Ok(person.ToDto());
     }
 
 
