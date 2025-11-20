@@ -18,6 +18,7 @@ builder.AddBollelistenDb();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IEntryService, EntryService>();
 builder.Services.AddTransient<ISoftAuthService, SoftAuthService>();
