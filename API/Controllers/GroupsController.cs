@@ -6,9 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class GroupsController(IGroupService groupService, ISoftAuthService softAuthService): ControllerBase
 {
-
+    /// <summary>
+    /// Get the currently authenticated group
+    /// </summary>
+    /// <remarks>
+    /// **Authentication Required**: This endpoint requires both the X-SessionId header and the groupKey cookie.
+    /// Call POST /login first to obtain the authentication cookie.
+    /// </remarks>
+    /// <returns>The currently authenticated group information</returns>
+    /// <response code="200">Returns the group information</response>
+    /// <response code="401">Authentication failed or missing credentials</response>
     [HttpGet("current")]
     public async Task<ActionResult> GetCurrentGroup()
     {
@@ -17,7 +28,16 @@ public class GroupsController(IGroupService groupService, ISoftAuthService softA
         return Ok(group.ToGroupDto());
     }
 
-
+    /// <summary>
+    /// Create a new group
+    /// </summary>
+    /// <remarks>
+    /// This endpoint does not require authentication. Use it to register a new group.
+    /// After creating a group, call POST /login with the group slug to authenticate.
+    /// </remarks>
+    /// <param name="groupItem">The group information to create</param>
+    /// <returns>The created group information</returns>
+    /// <response code="200">Group created successfully</response>
     [HttpPost]
     public async Task<ActionResult> CreateGroup([FromBody] CreateGroupRequest groupItem)
     {

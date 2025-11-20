@@ -19,9 +19,12 @@ public class CookieAuthMiddleware
 
     public async Task InvokeAsync(HttpContext context, ISoftAuthService softAuthService)
     {
-        // Skip certain paths (like login or static files)
+        // Skip certain paths (like login, swagger, or static files)
         if (context.Request.Path.StartsWithSegments("/login") ||
-            (context.Request.Path.StartsWithSegments("/groups") && context.Request.Method == "POST"))
+            (context.Request.Path.StartsWithSegments("/groups") && context.Request.Method == "POST") ||
+            context.Request.Path.StartsWithSegments("/swagger") ||
+            context.Request.Path.StartsWithSegments("/scalar") ||
+            context.Request.Path.StartsWithSegments("/openapi"))
         {
             await _next(context);
             return;

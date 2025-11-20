@@ -13,7 +13,9 @@ public class Group
     public required string Name { get; set; }
     [StringLength(256)]
     public string? Description { get; set; }
-    public required List<Person> Users { get; set; }
+
+    public IEnumerable<Person> People { get; init; } = [];
+    public IEnumerable<Entry> Entries { get; init; } = [];
     public DateTime CreatedAt { get; set; }
 
 }

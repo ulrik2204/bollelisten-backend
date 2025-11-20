@@ -16,7 +16,7 @@ public interface ISoftAuthService
     public Task<Group?> GetAuthenticatedGroup();
 
 }
-public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpContextAccessor httpContextAccessor)
+public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment): ISoftAuthService
 {
     private const string Separator = "|";
 
@@ -42,6 +42,12 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpCont
         var sessionKey = CreateSessionKey(sessionId, newGroupKey);
         cache.Set(group.Id, sessionKey, DateTimeOffset.Now.AddHours(1));
         cache.Set(sessionKey, group.Id, DateTimeOffset.Now.AddHours(1));
+        if (environment.IsDevelopment())
+        {
+            var localSessionKey = CreateSessionKey(sessionId, group.Slug);
+            cache.Set(localSessionKey, group.Id);
+            cache.Set(group.Id, localSessionKey);
+        }
 
         return newGroupKey;
     }
@@ -56,7 +62,7 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpCont
         if (sessionId == null || groupKey == null) return false;
 
         var sessionKey = CreateSessionKey(sessionId, groupKey);
-        var groupId = cache.Get<string>(sessionKey);
+        var groupId = cache.Get<Guid?>(sessionKey);
         if (groupId == null) return false;
         return true;
     }
@@ -74,10 +80,10 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpCont
 
         // Get the groupId for the groupKey
         var sessionKey = CreateSessionKey(sessionId, groupKey);
-        var groupId = cache.Get<string>(sessionKey);
+        var groupId = cache.Get<Guid?>(sessionKey);
         if (groupId == null) return null;
 
-        var group = await context.Groups.SingleOrDefaultAsync(g => g.Id.ToString() == groupId);
+        var group = await context.Groups.SingleOrDefaultAsync(g => g.Id == groupId);
         return group;
     }
 

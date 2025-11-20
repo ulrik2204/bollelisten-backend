@@ -35,8 +35,6 @@ public class GroupService(AppDbContext context) : IGroupService
             Slug = slug,
             Name = name,
             Description = description,
-            Users = [],
-
         };
         await context.Groups.AddAsync(group);
         await context.SaveChangesAsync();

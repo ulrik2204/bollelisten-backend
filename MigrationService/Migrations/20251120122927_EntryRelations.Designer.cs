@@ -3,6 +3,7 @@ using System;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MigrationService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251120122927_EntryRelations")]
+    partial class EntryRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,12 +111,12 @@ namespace MigrationService.Migrations
                     b.Property<Guid>("GroupsId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PeopleId")
+                    b.Property<Guid>("UsersId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("GroupsId", "PeopleId");
+                    b.HasKey("GroupsId", "UsersId");
 
-                    b.HasIndex("PeopleId");
+                    b.HasIndex("UsersId");
 
                     b.ToTable("GroupPerson");
                 });
@@ -147,7 +150,7 @@ namespace MigrationService.Migrations
 
                     b.HasOne("Data.Entities.Person", null)
                         .WithMany()
-                        .HasForeignKey("PeopleId")
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
