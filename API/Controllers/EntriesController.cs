@@ -11,6 +11,19 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class EntriesController(ISoftAuthService softAuthService, IEntryService entryService) : ControllerBase
 {
+
+    [HttpGet("{entryId}")]
+    public async Task<ActionResult> GetEntry(Guid entryId)
+    {
+        var group =  await softAuthService.GetAuthenticatedGroup();
+        if (group is null) return Unauthorized();
+
+        var entry = await entryService.GetEntryById(entryId);
+        if (entry is null) return NotFound();
+        return Ok(entry.ToDto());
+
+    }
+
     /// <summary>
     /// Get entries for the authenticated group
     /// </summary>

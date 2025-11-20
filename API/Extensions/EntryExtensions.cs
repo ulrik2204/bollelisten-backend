@@ -9,8 +9,7 @@ public static class EntryExtensions
     {
         return new EntryDto(
             Id: entry.Id,
-            person: entry.Person.ToDto(),
-            group: entry.Group.ToDto(),
+            Person: entry.Person.ToDto(),
             IncidentTime: entry.IncidentTime,
             FulfilledTime: entry.FulfilledTime
         );

@@ -6,12 +6,18 @@ namespace Common.Services;
 
 public interface IEntryService
 {
+    public Task<Entry?> GetEntryById(Guid entryId);
     public Task<List<Entry>> GetGroupEntries(Guid groupId, int limit = 0, int offset = 0);
     public Task<Entry?> CreateEntry(Guid personId, Guid groupId, DateTime incidentTime, DateTime? fulfilledTime);
 }
 
 public class EntryService(AppDbContext dbContext) : IEntryService
 {
+    public async Task<Entry?> GetEntryById(Guid entryId)
+    {
+        return await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
+    }
+
     public async Task<List<Entry>> GetGroupEntries(Guid groupId, int limit = 0, int offset = 0)
     {
         var entries = await dbContext.Entries.Where(entry => entry.GroupId == groupId)
