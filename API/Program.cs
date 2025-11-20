@@ -33,9 +33,14 @@ app.UseMiddleware<CookieAuthMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
+    app.MapGet("/", (context) =>
+    {
+        context.Response.Redirect("/scalar/v1");
+        return Task.CompletedTask;
+    });
     app.MapGet("/swagger", (context) =>
     {
-        context.Response.Redirect("scalar/v1");
+        context.Response.Redirect("/scalar/v1");
         return Task.CompletedTask;
     });
     app.MapOpenApi();
