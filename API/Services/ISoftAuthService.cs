@@ -1,4 +1,5 @@
 using API.Extensions;
+using Common.Services;
 using Data;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public interface ISoftAuthService
     public Task<Group?> GetAuthenticatedGroup();
 
 }
-public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment): ISoftAuthService
+public class SoftAuthService(IMemoryCache cache, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, IGroupService groupService): ISoftAuthService
 {
     private const string Separator = "|";
 
@@ -29,7 +30,7 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpCont
         var sessionId = httpContext.GetSessionId();
         if (sessionId == null) return null;
 
-        var group = await context.Groups.SingleOrDefaultAsync(group => group.Slug == groupSlug);
+        var group = await groupService.GetGroupBySlug(groupSlug, includePeople: false);
         if (group == null) return null;
         var cachedSessionKey = cache.Get<string>(group.Id);
         if (cachedSessionKey != null)
@@ -81,9 +82,9 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpCont
         // Get the groupId for the groupKey
         var sessionKey = CreateSessionKey(sessionId, groupKey);
         var groupId = cache.Get<Guid?>(sessionKey);
-        if (groupId == null) return null;
+        if (groupId is null) return null;
 
-        var group = await context.Groups.SingleOrDefaultAsync(g => g.Id == groupId);
+        var group = await groupService.GetGroupById(groupId.Value);
         return group;
     }
 
