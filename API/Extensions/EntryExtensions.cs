@@ -10,7 +10,7 @@ public static class EntryExtensions
         return new EntryDto(
             Id: entry.Id,
             person: entry.Person.ToDto(),
-            group: entry.Group.ToGroupDto(),
+            group: entry.Group.ToDto(),
             IncidentTime: entry.IncidentTime,
             FulfilledTime: entry.FulfilledTime
         );
