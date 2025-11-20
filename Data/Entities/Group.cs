@@ -7,15 +7,15 @@ namespace Data.Entities;
 public class Group
 {
     public required Guid Id { get; set; }
-    [StringLength(8, MinimumLength = 3)]
+    [StringLength(16, MinimumLength = 3)]
     public required string Slug { get; set; }
     [StringLength(128)]
     public required string Name { get; set; }
     [StringLength(256)]
     public string? Description { get; set; }
 
-    public IEnumerable<Person> People { get; init; } = [];
-    public IEnumerable<Entry> Entries { get; init; } = [];
+    public List<Person> People { get; init; } = [];
+    public List<Entry> Entries { get; init; } = [];
     public DateTime CreatedAt { get; set; }
 
 }

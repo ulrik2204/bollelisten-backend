@@ -9,5 +9,6 @@ public class Person
     [StringLength(128)]
     public required string Name { get; set; }
     public required DateTime CreatedAt { get; set; }
-    public required List<Group> Groups { get; set; }
+    public List<Group> Groups { get; set; } = [];
+    public List<Entry> Entries { get; set; } = [];
 }

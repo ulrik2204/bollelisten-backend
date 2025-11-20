@@ -1,4 +1,5 @@
 using API.Extensions;
+using API.Models;
 using API.Services;
 using Common.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,7 +24,8 @@ public class EntriesController(ISoftAuthService softAuthService, IEntryService e
     /// <response code="200">Returns the list of entries</response>
     /// <response code="401">Authentication failed or missing credentials</response>
     [HttpGet]
-    public async Task<ActionResult> GetEntries([FromQuery(Name = "limit")] int limit, [FromQuery(Name = "offset")] int offset)
+    public async Task<ActionResult> GetEntries([FromQuery(Name = "limit")] int limit,
+        [FromQuery(Name = "offset")] int offset)
     {
         // This is a placeholder for the actual implementation.
         // You would typically fetch entries from a database or another service.
@@ -33,4 +35,16 @@ public class EntriesController(ISoftAuthService softAuthService, IEntryService e
         return Ok(entries.Select(entry => entry.ToDto()));
     }
 
+    [HttpPost]
+    public async Task<ActionResult> CreateEntry([FromBody] CreateEntryRequest request)
+    {
+        var group = await softAuthService.GetAuthenticatedGroup();
+        if (group == null) return Unauthorized();
+
+        if (!Guid.TryParse(request.PersonId, out var personId))
+            return BadRequest("personId is in the from Guid format");
+        var entry = await entryService.CreateEntry(personId, group.Id, request.IncidentTime, request.FulfilledTime);
+        if (entry == null) return BadRequest();
+        return Created();
+    }
 }
