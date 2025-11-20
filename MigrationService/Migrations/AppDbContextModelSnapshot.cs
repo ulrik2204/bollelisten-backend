@@ -34,12 +34,12 @@ namespace MigrationService.Migrations
                     b.Property<DateTime>("IncidentTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("PersonId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Entries");
                 });
@@ -54,6 +54,10 @@ namespace MigrationService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -73,7 +77,7 @@ namespace MigrationService.Migrations
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("Data.Entities.User", b =>
+            modelBuilder.Entity("Data.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,21 +100,21 @@ namespace MigrationService.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("Users");
+                    b.ToTable("People");
                 });
 
             modelBuilder.Entity("Data.Entities.Entry", b =>
                 {
-                    b.HasOne("Data.Entities.User", "User")
+                    b.HasOne("Data.Entities.Person", "Person")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("Data.Entities.User", b =>
+            modelBuilder.Entity("Data.Entities.Person", b =>
                 {
                     b.HasOne("Data.Entities.Group", null)
                         .WithMany("Users")

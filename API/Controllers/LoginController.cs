@@ -21,7 +21,6 @@ public class LoginController(ISoftAuthService softAuthService): ControllerBase
         // Using the Set-Cookie header to set the cookie on the client
         HttpContext.SetGroupKeyCookie(groupKey);
         return Ok();
-
     }
 
 }

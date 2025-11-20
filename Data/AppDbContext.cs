@@ -2,21 +2,15 @@ using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 namespace Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<User> Users =>  Set<User>();
+    public DbSet<Person> People =>  Set<Person>();
     public DbSet<Entry> Entries =>  Set<Entry>();
     public DbSet<Group> Groups =>  Set<Group>();
 
-    // public string DbPath { get; }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>().Property(t => t.CreatedAt).HasDefaultValueSql("now()");
+        modelBuilder.Entity<Person>().Property(t => t.CreatedAt).HasDefaultValueSql("now()");
 
         modelBuilder.Entity<Group>().Property(t => t.CreatedAt).HasDefaultValueSql("now()");
 

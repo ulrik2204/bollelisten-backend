@@ -11,7 +11,9 @@ public class Group
     public required string Slug { get; set; }
     [StringLength(128)]
     public required string Name { get; set; }
-    public required DbSet<User> Users { get; set; }
+    [StringLength(256)]
+    public string? Description { get; set; }
+    public required List<Person> Users { get; set; }
     public DateTime CreatedAt { get; set; }
 
 }

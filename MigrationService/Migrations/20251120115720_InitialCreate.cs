@@ -18,6 +18,7 @@ namespace MigrationService.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Slug = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
@@ -26,7 +27,7 @@ namespace MigrationService.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "People",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -36,9 +37,9 @@ namespace MigrationService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_People", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Groups_GroupId",
+                        name: "FK_People_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id");
@@ -50,24 +51,24 @@ namespace MigrationService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     IncidentTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PersonId = table.Column<Guid>(type: "uuid", nullable: false),
                     FulfilledTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Entries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Entries_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_Entries_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entries_UserId",
+                name: "IX_Entries_PersonId",
                 table: "Entries",
-                column: "UserId");
+                column: "PersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Groups_Slug",
@@ -76,8 +77,8 @@ namespace MigrationService.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_GroupId",
-                table: "Users",
+                name: "IX_People_GroupId",
+                table: "People",
                 column: "GroupId");
         }
 
@@ -88,7 +89,7 @@ namespace MigrationService.Migrations
                 name: "Entries");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "People");
 
             migrationBuilder.DropTable(
                 name: "Groups");

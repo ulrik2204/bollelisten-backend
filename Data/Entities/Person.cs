@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Entities;
 
-public class User
+public class Person
 {
     public required Guid Id { get; set; }
     [StringLength(128)]

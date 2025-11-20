@@ -20,7 +20,8 @@ public class CookieAuthMiddleware
     public async Task InvokeAsync(HttpContext context, ISoftAuthService softAuthService)
     {
         // Skip certain paths (like login or static files)
-        if (context.Request.Path.StartsWithSegments("/login"))
+        if (context.Request.Path.StartsWithSegments("/login") ||
+            (context.Request.Path.StartsWithSegments("/groups") && context.Request.Method == "POST"))
         {
             await _next(context);
             return;
@@ -33,7 +34,6 @@ public class CookieAuthMiddleware
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("Unauthorized: missing X-SessionId header.");
             return;
-
         }
 
         var groupKey = context.GetGroupKeyCookie();

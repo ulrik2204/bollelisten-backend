@@ -54,8 +54,8 @@ This project uses .NET Aspire for orchestration and follows a clean architecture
 Migrations are automatically run on startup by the MigrationService. To add new migrations:
 
 ```bash
-cd Data
-dotnet ef migrations add <MigrationName> --startup-project ../MigrationService
+cd MigrationService
+dotnet ef migrations add <MigrationName>
 ```
 
 ## 🔧 Configuration
