@@ -12,5 +12,6 @@ public static class PersonExtensions
             person.Id,
             person.Name
         );
+    }
 
 }
