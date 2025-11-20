@@ -27,8 +27,6 @@ public class EntriesController(ISoftAuthService softAuthService, IEntryService e
     public async Task<ActionResult> GetEntries([FromQuery(Name = "limit")] int limit,
         [FromQuery(Name = "offset")] int offset)
     {
-        // This is a placeholder for the actual implementation.
-        // You would typically fetch entries from a database or another service.
         var group = await softAuthService.GetAuthenticatedGroup();
         if (group == null) return Unauthorized();
         var entries = await entryService.GetGroupEntries(group.Id, limit, offset);
