@@ -1,3 +1,4 @@
+using API.Extensions;
 using Data;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,20 +9,26 @@ namespace API.Services;
 public interface ISoftAuthService
 {
 
-    public Task<string?> Authenticate(string sessionId, string groupSlug);
+    public Task<string?> Authenticate(string groupSlug);
 
-    public bool IsAuthenticated(string sessionId, string groupKey);
+    public bool IsAuthenticated();
 
-    public Task<Group?> GetAuthenticatedGroup(string sessionId, string groupKey);
+    public Task<Group?> GetAuthenticatedGroup();
 
 }
-public class SoftAuthService(AppDbContext context, IMemoryCache cache)
+public class SoftAuthService(AppDbContext context, IMemoryCache cache, IHttpContextAccessor httpContextAccessor)
 {
     private const string Separator = "|";
 
     // Returns the groupKey
-    public async Task<string?> Authenticate(string sessionId, string groupSlug)
+    public async Task<string?> Authenticate(string groupSlug)
     {
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext == null) return null;
+
+        var sessionId = httpContext.GetSessionId();
+        if (sessionId == null) return null;
+
         var group = await context.Groups.SingleOrDefaultAsync(group => group.Slug == groupSlug);
         if (group == null) return null;
         var cachedSessionKey = cache.Get<string>(group.Id);
@@ -39,8 +46,15 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache)
         return newGroupKey;
     }
 
-    public bool IsAuthenticated(string sessionId, string groupKey)
+    public bool IsAuthenticated()
     {
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext == null) return false;
+
+        var sessionId = httpContext.GetSessionId();
+        var groupKey = httpContext.GetGroupKeyCookie();
+        if (sessionId == null || groupKey == null) return false;
+
         var sessionKey = CreateSessionKey(sessionId, groupKey);
         var groupId = cache.Get<string>(sessionKey);
         if (groupId == null) return false;
@@ -49,8 +63,15 @@ public class SoftAuthService(AppDbContext context, IMemoryCache cache)
 
 
 
-    public async Task<Group?> GetAuthenticatedGroup(string sessionId, string groupKey)
+    public async Task<Group?> GetAuthenticatedGroup()
     {
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext == null) return null;
+
+        var sessionId = httpContext.GetSessionId();
+        var groupKey = httpContext.GetGroupKeyCookie();
+        if (sessionId == null || groupKey == null) return null;
+
         // Get the groupId for the groupKey
         var sessionKey = CreateSessionKey(sessionId, groupKey);
         var groupId = cache.Get<string>(sessionKey);

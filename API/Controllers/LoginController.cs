@@ -16,7 +16,7 @@ public class LoginController(ISoftAuthService softAuthService): ControllerBase
     {
         var sessionId = HttpContext.GetSessionId();
         if (sessionId == null) return Unauthorized("Missing X-SessionId header in request");
-        var groupKey = await softAuthService.Authenticate(sessionId, groupLoginRequest.GroupSlug);
+        var groupKey = await softAuthService.Authenticate(groupLoginRequest.GroupSlug);
         if (groupKey == null) return Unauthorized("Group with given slug not found");
         // Using the Set-Cookie header to set the cookie on the client
         HttpContext.SetGroupKeyCookie(groupKey);

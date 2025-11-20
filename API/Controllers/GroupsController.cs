@@ -1,18 +1,19 @@
 using API.Extensions;
+using API.Services;
 using Common.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class GroupsController(IGroupService groupService): ControllerBase
+public class GroupsController(IGroupService groupService, ISoftAuthService softAuthService): ControllerBase
 {
 
-    [HttpGet("/{slug}")]
-    public async Task<ActionResult> GetGroupBySlug(string slug)
+    [HttpGet("current")]
+    public async Task<ActionResult> GetCurrentGroup()
     {
-        var group = await groupService.GetGroupBySlug(slug);
-        if (group == null) return NotFound();
+        var group = await softAuthService.GetAuthenticatedGroup();
+        if (group == null) return Unauthorized();
         return Ok(group.ToGroupDto());
     }
 

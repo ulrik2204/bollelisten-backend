@@ -27,27 +27,11 @@ public class CookieAuthMiddleware
             return;
         }
 
-        // Check if cookie exists
-        var sessionId = context.GetSessionId();
-        if (sessionId == null)
+        if (!softAuthService.IsAuthenticated())
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized: missing X-SessionId header.");
-            return;
-        }
-
-        var groupKey = context.GetGroupKeyCookie();
-        if (groupKey == null)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized: missing authentication cookie.");
-            return;
-        }
-
-        if (!softAuthService.IsAuthenticated(sessionId, groupKey))
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized: group not found.");
+            await context.Response.WriteAsync(
+                "Unauthorized: Invalid or missing authentication. Required both the X-SessionId header and the groupKey cookie");
             return;
         }
 
