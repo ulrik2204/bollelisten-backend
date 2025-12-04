@@ -18,6 +18,18 @@ builder.AddBollelistenDb();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(myAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5000", "https://bollelisten.rosby.no")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IEntryService, EntryService>();
@@ -26,6 +38,8 @@ builder.Services.AddTransient<ISoftAuthService, SoftAuthService>();
 
 // Step 2: Build the application and setup endpoints
 var app = builder.Build();
+
+app.UseCors(myAllowSpecificOrigins);
 
 
 app.UseMiddleware<CookieAuthMiddleware>();
