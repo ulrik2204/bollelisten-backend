@@ -26,8 +26,8 @@ public static class HttpContextExtensions
             new CookieOptions
             {
                 HttpOnly = true,         // Prevents JavaScript access
-                Secure = true,           // Ensures it’s sent only over HTTPS
-                SameSite = SameSiteMode.Strict, // Adjust as needed
+                Secure = false,           // Ensures it’s sent only over HTTPS
+                SameSite = SameSiteMode.Lax, // Adjust as needed
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
     }

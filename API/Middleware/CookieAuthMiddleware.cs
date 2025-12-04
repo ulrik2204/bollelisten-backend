@@ -19,6 +19,12 @@ public class CookieAuthMiddleware
 
     public async Task InvokeAsync(HttpContext context, ISoftAuthService softAuthService)
     {
+        // Always allow OPTIONS requests to pass through for CORS
+        if (context.Request.Method == "OPTIONS")
+        {
+            await _next(context);
+            return;
+        }
         // Skip certain paths (like login, swagger, or static files)
         if (context.Request.Path.StartsWithSegments("/login") ||
             (context.Request.Path.StartsWithSegments("/groups") && context.Request.Method == "POST") ||
@@ -29,6 +35,8 @@ public class CookieAuthMiddleware
             await _next(context);
             return;
         }
+        Console.WriteLine("SessionId: " + context.GetSessionId());
+        Console.WriteLine("groupKey: " + context.GetGroupKeyCookie());
 
         if (!softAuthService.IsAuthenticated())
         {

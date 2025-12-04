@@ -37,8 +37,8 @@ public class EntriesController(ISoftAuthService softAuthService, IEntryService e
     /// <response code="200">Returns the list of entries</response>
     /// <response code="401">Authentication failed or missing credentials</response>
     [HttpGet]
-    public async Task<ActionResult> GetEntries([FromQuery(Name = "limit")] int limit,
-        [FromQuery(Name = "offset")] int offset)
+    public async Task<ActionResult> GetEntries([FromQuery(Name = "limit")] int? limit,
+        [FromQuery(Name = "offset")] int? offset)
     {
         var group = await softAuthService.GetAuthenticatedGroup();
         if (group == null) return Unauthorized();

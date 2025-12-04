@@ -9,7 +9,10 @@ using Scalar.AspNetCore;
 // Step 1: Configure the builder
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
 builder.AddServiceDefaults();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -26,7 +29,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:5000", "https://bollelisten.rosby.no")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials(); // Added to support credentials
         });
 });
 

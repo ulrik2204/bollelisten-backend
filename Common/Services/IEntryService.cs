@@ -8,7 +8,7 @@ public interface IEntryService
 {
     public Task<Entry?> UpdateEntryById(Guid entryId, DateTime? incidentTime, DateTime? fulfilledTime);
     public Task<Entry?> GetEntryById(Guid entryId);
-    public Task<List<Entry>> GetGroupEntries(Guid groupId, int limit = 0, int offset = 0);
+    public Task<List<Entry>> GetGroupEntries(Guid groupId, int? limit = null, int? offset = null);
     public Task<Entry?> CreateEntry(Guid personId, Guid groupId, DateTime incidentTime, DateTime? fulfilledTime);
     public Task<bool> DeleteEntryById(Guid entryId);
 }
@@ -20,14 +20,18 @@ public class EntryService(AppDbContext dbContext) : IEntryService
         return await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
     }
 
-    public async Task<List<Entry>> GetGroupEntries(Guid groupId, int limit = 0, int offset = 0)
+    public async Task<List<Entry>> GetGroupEntries(Guid groupId, int? limit = null, int? offset = null)
     {
-        var entries = await dbContext.Entries.Where(entry => entry.GroupId == groupId)
+        var query = dbContext.Entries.Where(entry => entry.GroupId == groupId)
             .Include(entry => entry.Person)
             .OrderBy(entry => entry.IncidentTime)
-            .Skip(offset)
-            .Take(limit)
-            .ToListAsync();
+            as IQueryable<Entry>;
+        if (offset.HasValue && offset.Value > 0)
+            query = query.Skip(offset.Value);
+        if (limit.HasValue && limit.Value > 0)
+            query = query.Take(limit.Value);
+        var entries = await query.ToListAsync();
+
         return entries;
     }
 

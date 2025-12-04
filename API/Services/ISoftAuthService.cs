@@ -41,14 +41,7 @@ public class SoftAuthService(IMemoryCache cache, IHttpContextAccessor httpContex
 
         var newGroupKey = "key-" + Guid.NewGuid();
         var sessionKey = CreateSessionKey(sessionId, newGroupKey);
-        cache.Set(group.Id, sessionKey, DateTimeOffset.Now.AddHours(1));
         cache.Set(sessionKey, group.Id, DateTimeOffset.Now.AddHours(1));
-        if (environment.IsDevelopment())
-        {
-            var localSessionKey = CreateSessionKey(sessionId, group.Slug);
-            cache.Set(localSessionKey, group.Id);
-            cache.Set(group.Id, localSessionKey);
-        }
 
         return newGroupKey;
     }
@@ -64,6 +57,7 @@ public class SoftAuthService(IMemoryCache cache, IHttpContextAccessor httpContex
 
         var sessionKey = CreateSessionKey(sessionId, groupKey);
         var groupId = cache.Get<Guid?>(sessionKey);
+        Console.WriteLine("GroupId" + groupId);
         if (groupId == null) return false;
         return true;
     }
