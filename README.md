@@ -1,6 +1,6 @@
 # Bollelisten
 
-A .NET 9 distributed application built with .NET Aspire for tracking incidents and managing groups and users.
+A .NET 10 distributed application built with .NET Aspire for tracking incidents and managing groups and users.
 
 ## 🏗️ Architecture
 
@@ -19,7 +19,7 @@ This project uses .NET Aspire for orchestration and follows a clean architecture
 
 ### Prerequisites
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (for PostgreSQL container)
 - IDE: Visual Studio 2022, JetBrains Rider, or VS Code
 

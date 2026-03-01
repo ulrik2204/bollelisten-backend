@@ -1,4 +1,5 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using System.Text.Json.Nodes;
 
 namespace API.Configuration;
 
@@ -26,7 +27,7 @@ public static class OpenApiConfiguration
                 {
                     foreach (var operation in path.Value.Operations)
                     {
-                        operation.Value.Parameters ??= new List<OpenApiParameter>();
+                        operation.Value.Parameters ??= new List<IOpenApiParameter>();
                         operation.Value.Parameters.Add(new OpenApiParameter
                         {
                             Name = "X-SessionId",
@@ -35,8 +36,8 @@ public static class OpenApiConfiguration
                             Description = "Unique session identifier",
                             Schema = new OpenApiSchema
                             {
-                                Type = "string",
-                                Default = new Microsoft.OpenApi.Any.OpenApiString(guid)
+                                Type = JsonSchemaType.String,
+                                Default = JsonValue.Create(guid)
                             }
                         });
                     }
@@ -47,4 +48,3 @@ public static class OpenApiConfiguration
         });
     }
 }
-
