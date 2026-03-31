@@ -1,6 +1,5 @@
 using API.Extensions;
 using API.Models;
-using API.Services;
 using Common.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,15 +7,15 @@ namespace API.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
-public class PeopleController(ISoftAuthService softAuthService, IPersonService personService): ControllerBase
+[Route("groups/{groupSlug}/[controller]")]
+public class PeopleController(IGroupService groupService, IPersonService personService) : ControllerBase
 {
 
     [HttpGet]
-    public async Task<ActionResult> GetPeople()
+    public async Task<ActionResult> GetPeople(string groupSlug)
     {
-        var group = await softAuthService.GetAuthenticatedGroup();
-        if (group == null) return Unauthorized();
+        var group = await groupService.GetGroupBySlug(groupSlug, includePeople: false);
+        if (group == null) return NotFound("Group not found");
 
         var people = await personService.GetPeople(group.Id);
         return Ok(people.Select(person => person.ToDto()).ToList());
@@ -24,7 +23,7 @@ public class PeopleController(ISoftAuthService softAuthService, IPersonService p
     }
 
     [HttpGet("{personId}")]
-    public async Task<ActionResult> GetPerson(Guid personId)
+    public async Task<ActionResult> GetPerson(string groupSlug, Guid personId)
     {
         var person = await personService.GetPerson(personId);
         if (person == null) return NotFound();
@@ -33,13 +32,13 @@ public class PeopleController(ISoftAuthService softAuthService, IPersonService p
 
 
     [HttpPost]
-    public async Task<ActionResult> CreatePerson([FromBody] CreatePersonRequest request)
+    public async Task<ActionResult> CreatePerson(string groupSlug, [FromBody] CreatePersonRequest request)
     {
-        var group = await softAuthService.GetAuthenticatedGroup();
-        if (group == null) return Unauthorized();
+        var group = await groupService.GetGroupBySlug(groupSlug, includePeople: false);
+        if (group == null) return NotFound("Group not found");
 
         var person = await personService.CreatePerson(request.Name, [group]);
-        return Created($"/people/{person.Id}", person);
+        return Created($"/groups/{groupSlug}/people/{person.Id}", person.ToDto());
     }
 
 

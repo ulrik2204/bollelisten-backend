@@ -1,30 +1,25 @@
 using API.Extensions;
-using API.Services;
 using Common.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class GroupsController(IGroupService groupService, ISoftAuthService softAuthService): ControllerBase
+public class GroupsController(IGroupService groupService) : ControllerBase
 {
     /// <summary>
-    /// Get the currently authenticated group
+    /// Get a group by its slug
     /// </summary>
-    /// <remarks>
-    /// **Authentication Required**: This endpoint requires both the X-SessionId header and the groupKey cookie.
-    /// Call POST /login first to obtain the authentication cookie.
-    /// </remarks>
-    /// <returns>The currently authenticated group information</returns>
+    /// <param name="groupSlug">The unique slug identifying the group</param>
+    /// <returns>The group information</returns>
     /// <response code="200">Returns the group information</response>
-    /// <response code="401">Authentication failed or missing credentials</response>
-    [HttpGet("current")]
-    public async Task<ActionResult> GetCurrentGroup()
+    /// <response code="404">Group not found</response>
+    [HttpGet("{groupSlug}")]
+    public async Task<ActionResult> GetGroup(string groupSlug)
     {
-        var group = await softAuthService.GetAuthenticatedGroup();
-        if (group == null) return Unauthorized();
+        var group = await groupService.GetGroupBySlug(groupSlug);
+        if (group == null) return NotFound();
         return Ok(group.ToDto());
     }
 
@@ -32,18 +27,17 @@ public class GroupsController(IGroupService groupService, ISoftAuthService softA
     /// Create a new group
     /// </summary>
     /// <remarks>
-    /// This endpoint does not require authentication. Use it to register a new group.
-    /// After creating a group, call POST /login with the group slug to authenticate.
+    /// Use it to register a new group. After creating a group, use its slug to access group-scoped resources.
     /// </remarks>
     /// <param name="groupItem">The group information to create</param>
     /// <returns>The created group information</returns>
-    /// <response code="200">Group created successfully</response>
+    /// <response code="201">Group created successfully</response>
     [HttpPost]
     public async Task<ActionResult> CreateGroup([FromBody] CreateGroupRequest groupItem)
     {
         var group = await groupService.CreateGroup(groupItem.Slug, groupItem.Name, groupItem.Description);
         if (group == null) throw new Exception("Group was not created");
-        return Created((string?)null, group.ToDto());
+        return Created($"/groups/{group.Slug}", group.ToDto());
     }
 }
 

@@ -1,6 +1,4 @@
 using API.Configuration;
-using API.Middleware;
-using API.Services;
 using Common.Extensions;
 using Common.Services;
 using ServiceDefaults;
@@ -18,9 +16,6 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.AddBollelistenDb();
 
-builder.Services.AddMemoryCache();
-builder.Services.AddHttpContextAccessor();
-
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
@@ -37,16 +32,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IEntryService, EntryService>();
-builder.Services.AddTransient<ISoftAuthService, SoftAuthService>();
 
 
 // Step 2: Build the application and setup endpoints
 var app = builder.Build();
 
 app.UseCors(myAllowSpecificOrigins);
-
-
-app.UseMiddleware<CookieAuthMiddleware>();
 
 
 if (app.Environment.IsDevelopment())
