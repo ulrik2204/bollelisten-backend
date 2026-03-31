@@ -6,7 +6,7 @@ using Scalar.AspNetCore;
 
 // Step 1: Configure the builder
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.ConfigureOpenApi();
+// builder.Services.ConfigureOpenApi();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
@@ -59,8 +59,10 @@ if (app.Environment.IsDevelopment())
         options.Servers = [];
     });
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 app.MapControllers();
 
 // Step 3: Run the application
