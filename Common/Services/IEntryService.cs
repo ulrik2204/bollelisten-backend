@@ -17,7 +17,7 @@ public class EntryService(AppDbContext dbContext) : IEntryService
 {
     public async Task<Entry?> GetEntryById(Guid entryId)
     {
-        return await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
+        return await dbContext.Entries.Include(e => e.Person).FirstOrDefaultAsync(e => e.Id == entryId);
     }
 
     public async Task<List<Entry>> GetGroupEntries(Guid groupId, int? limit = null, int? offset = null)
@@ -52,12 +52,13 @@ public class EntryService(AppDbContext dbContext) : IEntryService
         };
         await dbContext.Entries.AddAsync(entry);
         await dbContext.SaveChangesAsync();
+        await dbContext.Entry(entry).Reference(e => e.Person).LoadAsync();
         return entry;
     }
 
     public async Task<Entry?> UpdateEntryById(Guid entryId, DateTime? incidentTime, DateTime? fulfilledTime)
     {
-        var entry = await dbContext.Entries.FirstOrDefaultAsync(e => e.Id == entryId);
+        var entry = await dbContext.Entries.Include(e => e.Person).FirstOrDefaultAsync(e => e.Id == entryId);
         if (entry == null) return null;
 
         // Verify that the person exists
