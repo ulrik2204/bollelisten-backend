@@ -11,8 +11,7 @@ public class SlackController(IGroupService groupService, IPersonService personSe
 {
     /// <summary>
     /// Handle Slack /bolle slash command.
-    /// Usage: /bolle [personName]
-    /// If personName is omitted, uses the Slack user's username.
+    /// Usage: /bolle
     /// The channel name is used as the group slug. If the group doesn't exist, it is created.
     /// </summary>
     [HttpPost("entries")]
