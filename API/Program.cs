@@ -12,6 +12,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 });
 builder.AddServiceDefaults();
+builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.AddBollelistenDb();
