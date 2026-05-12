@@ -13,7 +13,7 @@ var postgres = builder
 
 var db = postgres.AddDatabase("bollelisten");
 
-builder.AddProject<MigrationService>("Migrations").WaitFor(postgres).WithReference(db);
-builder.AddProject<API>("API").WaitFor(db).WithReference(db);
+var migrations = builder.AddProject<MigrationService>("Migrations").WaitFor(postgres).WithReference(db);
+builder.AddProject<API>("API").WaitFor(migrations).WithReference(db);
 
 builder.Build().Run();
