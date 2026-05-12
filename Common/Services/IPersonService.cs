@@ -9,6 +9,7 @@ public interface IPersonService
 
     public Task<List<Person>> GetPeople(Guid groupId);
     public Task<Person?> GetPerson(Guid id);
+    public Task<Person?> GetPersonByName(Guid groupId, string name);
     public Task<Person> CreatePerson(string name, List<Group>? groups = null);
 }
 
@@ -27,6 +28,12 @@ public class PersonService(AppDbContext dbContext) : IPersonService
         return person;
     }
 
+    public async Task<Person?> GetPersonByName(Guid groupId, string name)
+    {
+        return await dbContext.People
+            .FirstOrDefaultAsync(p => p.Groups.Any(g => g.Id == groupId)
+                                      && p.Name.ToLower() == name.ToLower());
+    }
 
     public async Task<Person> CreatePerson(string name, List<Group>? groups = null)
     {
