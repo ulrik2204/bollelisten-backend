@@ -12,6 +12,8 @@ public class SlackSlashCommandRequest
 
     [FromForm(Name = "channel_id")]
     public string? ChannelId { get; set; }
+    [FromForm(Name = "channel_name")]
+    public string? ChannelName { get; set; }
 
     [FromForm(Name = "user_id")]
     public string? UserId { get; set; }

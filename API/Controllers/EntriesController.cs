@@ -107,6 +107,6 @@ public class EntriesController(IGroupService groupService, IEntryService entrySe
             return Ok(new SlackResponse("ephemeral", "Failed to create entry."));
 
         return Ok(new SlackResponse("in_channel",
-            $"\ud83d\udfe2 {person.Name} got a bolle in {group.Name}!"));
+            $"\ud83d\udfe2 {person.Name} skylder en bolle til {request.ChannelName}!"));
     }
 }
