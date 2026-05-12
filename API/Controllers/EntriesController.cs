@@ -7,7 +7,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("groups/{groupSlug}/[controller]")]
-public class EntriesController(IGroupService groupService, IEntryService entryService) : ControllerBase
+public class EntriesController(IGroupService groupService, IEntryService entryService, IPersonService personService) : ControllerBase
 {
 
     [HttpGet("{entryId}")]
@@ -74,5 +74,39 @@ public class EntriesController(IGroupService groupService, IEntryService entrySe
         var deleted = await entryService.DeleteEntryById(entryId);
         if (!deleted) return NotFound();
         return NoContent();
+    }
+
+    /// <summary>
+    /// Handle Slack /bolle slash command.
+    /// Usage: /bolle [personName]
+    /// If personName is omitted, uses the Slack user's username.
+    /// </summary>
+    [HttpPost("slack")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<ActionResult> HandleSlackCommand(string groupSlug, [FromForm] SlackSlashCommandRequest request)
+    {
+        var personName = request.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(personName))
+            personName = request.UserName;
+
+        if (string.IsNullOrWhiteSpace(personName))
+            return Ok(new SlackResponse("ephemeral", "Could not determine person name."));
+
+        var group = await groupService.GetGroupBySlug(groupSlug, includePeople: false);
+        if (group == null)
+            return Ok(new SlackResponse("ephemeral", $"Group \"{groupSlug}\" not found."));
+
+        var person = await personService.GetPersonByName(group.Id, personName);
+        if (person == null)
+        {
+            person = await personService.CreatePerson(personName, [group]);
+        }
+
+        var entry = await entryService.CreateEntry(person.Id, group.Id, DateTime.UtcNow, fulfilledTime: null);
+        if (entry == null)
+            return Ok(new SlackResponse("ephemeral", "Failed to create entry."));
+
+        return Ok(new SlackResponse("in_channel",
+            $"\ud83d\udfe2 {person.Name} got a bolle in {group.Name}!"));
     }
 }
